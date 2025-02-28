@@ -48,12 +48,12 @@ const Index = () => {
           </nav>
           
           <div className="flex items-center gap-4">
-            <Link to="/dashboard">
+            <Link to="/signin">
               <Button variant="outline" size="sm">
                 Sign In
               </Button>
             </Link>
-            <Link to="/dashboard">
+            <Link to="/signup">
               <Button size="sm">Get Started</Button>
             </Link>
           </div>
@@ -75,7 +75,7 @@ const Index = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                  <Link to="/dashboard">
+                  <Link to="/signup">
                     <Button size="lg" className="gap-1.5">
                       <span>Start Brainstorming</span>
                       <ArrowRight className="h-4 w-4" />
@@ -284,7 +284,7 @@ const Index = () => {
                   Join thousands of teams using MindBoard to collaborate more effectively.
                 </p>
               </div>
-              <Link to="/dashboard">
+              <Link to="/signup">
                 <Button size="lg" className="w-full md:w-auto">Get Started</Button>
               </Link>
             </div>
