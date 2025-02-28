@@ -87,6 +87,7 @@ const NewIdeaForm: React.FC<NewIdeaFormProps> = ({ topic, onSuccess }) => {
       authorId: currentUser.id,
       categoryId,
       customTags: tags,
+      votes: [], // Adding the missing votes property as an empty array
     });
     
     // Reset form
