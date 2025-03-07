@@ -1,209 +1,230 @@
 
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ChevronLeft, Users, Clock, BarChart4, Filter, Grid3X3, List, MessageSquare, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { PlusCircle, MessageCircle, ThumbsUp, UserPlus, MoreHorizontal } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { toast } from 'sonner';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-
-type Idea = {
-  id: string;
-  content: string;
-  author: {
-    name: string;
-    avatar?: string;
-    initials: string;
-  };
-  votes: number;
-  comments: number;
-  createdAt: string;
-};
+import { Separator } from '@/components/ui/separator';
+import { useAppContext } from '@/context/AppContext';
+import NewIdeaForm from '@/components/NewIdeaForm';
+import TopicCard from '@/components/TopicCard';
+import IdeaCard from '@/components/IdeaCard';
 
 const ViewBoard = () => {
-  const { boardId } = useParams();
+  const { boardId } = useParams<{ boardId: string }>();
   const navigate = useNavigate();
-  const [newIdea, setNewIdea] = useState('');
+  const { topics, users, ideas } = useAppContext();
   
-  // Mock board data
-  const board = {
-    id: boardId || '1',
-    name: 'Product Brainstorming Session',
-    description: 'Ideas for our next product release',
-    createdAt: '2023-09-15T10:30:00Z',
-    participants: [
-      { id: '1', name: 'Alex Johnson', avatar: '/placeholder.svg', initials: 'AJ' },
-      { id: '2', name: 'Sarah Chen', avatar: '/placeholder.svg', initials: 'SC' },
-      { id: '3', name: 'Miguel Diaz', avatar: '/placeholder.svg', initials: 'MD' },
-    ],
-  };
+  const [viewType, setViewType] = useState<'card' | 'table'>('card');
   
-  // Mock ideas data
-  const [ideas, setIdeas] = useState<Idea[]>([
-    {
-      id: '1',
-      content: 'Add a dark mode option to improve accessibility and reduce eye strain',
-      author: { name: 'Alex Johnson', avatar: '/placeholder.svg', initials: 'AJ' },
-      votes: 12,
-      comments: 3,
-      createdAt: '2023-09-15T11:30:00Z',
-    },
-    {
-      id: '2',
-      content: 'Implement a notification system for important updates',
-      author: { name: 'Sarah Chen', avatar: '/placeholder.svg', initials: 'SC' },
-      votes: 8,
-      comments: 5,
-      createdAt: '2023-09-15T12:15:00Z',
-    },
-    {
-      id: '3',
-      content: 'Create a mobile app version for on-the-go access',
-      author: { name: 'Miguel Diaz', avatar: '/placeholder.svg', initials: 'MD' },
-      votes: 15,
-      comments: 7,
-      createdAt: '2023-09-15T13:00:00Z',
-    },
-  ]);
-
-  const handleAddIdea = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!newIdea.trim()) {
-      toast.error('Please enter an idea');
-      return;
-    }
-
-    const idea: Idea = {
-      id: Date.now().toString(),
-      content: newIdea,
-      author: { name: 'You', initials: 'YO' },
-      votes: 0,
-      comments: 0,
-      createdAt: new Date().toISOString(),
-    };
-
-    setIdeas([idea, ...ideas]);
-    setNewIdea('');
-    toast.success('Idea added successfully!');
-  };
-
-  const handleVote = (ideaId: string) => {
-    setIdeas(
-      ideas.map((idea) =>
-        idea.id === ideaId ? { ...idea, votes: idea.votes + 1 } : idea
-      )
+  // Find the current topic
+  const topic = topics.find(t => t.id === boardId);
+  
+  if (!topic) {
+    return (
+      <div className="container py-12 text-center">
+        <h1 className="text-2xl font-bold mb-4">Board Not Found</h1>
+        <p className="mb-8">The board you're looking for doesn't exist or you don't have access to it.</p>
+        <Button onClick={() => navigate('/dashboard')}>Return to Dashboard</Button>
+      </div>
     );
+  }
+  
+  // Find the topic owner
+  const owner = users.find(user => user.id === topic.ownerId);
+  
+  // Get the current workflow stage
+  const currentStage = topic.workflow.currentStage;
+  const stageLabels: Record<string, string> = {
+    introduction: 'Introduction',
+    submission: 'Submission',
+    classification: 'Classification',
+    review: 'Review',
+    voting: 'Voting',
+    finalization: 'Finalization'
   };
-
+  
+  // Filter ideas for this topic
+  const topicIdeas = ideas.filter(idea => idea.topicId === topic.id);
+  
   return (
-    <div className="container max-w-6xl py-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">{board.name}</h1>
-          <p className="text-muted-foreground">{board.description}</p>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={() => navigate('/dashboard')}>
-            Back to Dashboard
-          </Button>
-          <Button variant="outline" onClick={() => toast.success('Invitation link copied to clipboard!')}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Board Settings</DropdownMenuItem>
-              <DropdownMenuItem>Export</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">Delete Board</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 mb-6">
-        <span className="text-sm text-muted-foreground">Participants:</span>
-        <div className="flex -space-x-2">
-          {board.participants.map((participant) => (
-            <Avatar key={participant.id} className="border-2 border-background h-8 w-8">
-              <AvatarImage src={participant.avatar} alt={participant.name} />
-              <AvatarFallback>{participant.initials}</AvatarFallback>
-            </Avatar>
-          ))}
-          <Avatar className="border-2 border-background bg-primary h-8 w-8">
-            <AvatarFallback>+</AvatarFallback>
-          </Avatar>
-        </div>
-      </div>
-
-      <div className="mb-8">
-        <form onSubmit={handleAddIdea} className="flex gap-3">
-          <Input
-            placeholder="Add your idea..."
-            value={newIdea}
-            onChange={(e) => setNewIdea(e.target.value)}
-            className="flex-grow"
-          />
-          <Button type="submit">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Idea
-          </Button>
-        </form>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {ideas.map((idea) => (
-          <Card key={idea.id} className="h-full">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={idea.author.avatar} />
-                    <AvatarFallback>{idea.author.initials}</AvatarFallback>
+    <div className="flex flex-col min-h-screen">
+      {/* Top Navigation */}
+      <header className="border-b bg-white">
+        <div className="container flex items-center h-16 justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" asChild>
+              <Link to="/dashboard">
+                <ChevronLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+            <h1 className="font-semibold truncate">{topic.title}</h1>
+            <Badge variant="outline" className="ml-2">
+              {stageLabels[currentStage]}
+            </Badge>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex -space-x-2">
+              {topic.participants.slice(0, 3).map((participant, index) => {
+                const user = users.find(u => u.id === participant.userId);
+                if (!user) return null;
+                
+                return (
+                  <Avatar key={index} className="h-8 w-8 border-2 border-background">
+                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">{idea.author.name}</span>
+                );
+              })}
+              
+              {topic.participants.length > 3 && (
+                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs border-2 border-background">
+                  +{topic.participants.length - 3}
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  {new Date(idea.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4">{idea.content}</p>
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => handleVote(idea.id)}
-                >
-                  <ThumbsUp className="mr-1 h-4 w-4" /> {idea.votes}
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <MessageCircle className="mr-1 h-4 w-4" /> {idea.comments}
-                </Button>
+              )}
+            </div>
+            
+            <Button variant="outline" size="sm">
+              <Users className="h-4 w-4 mr-2" />
+              Invite
+            </Button>
+          </div>
+        </div>
+      </header>
+      
+      {/* Main Content */}
+      <div className="flex-grow bg-muted/20 overflow-y-auto">
+        <div className="container py-6">
+          {/* Topic Info */}
+          <Card className="mb-6">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-semibold mb-2">{topic.title}</h2>
+                  <p className="text-muted-foreground mb-4">{topic.description}</p>
+                  
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {topic.categories.map(category => (
+                      <Badge 
+                        key={category.id} 
+                        className="text-xs font-normal" 
+                        style={{ 
+                          backgroundColor: `${category.color}20`, 
+                          color: category.color, 
+                          borderColor: `${category.color}40` 
+                        }}
+                      >
+                        {category.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div className="text-sm">
+                      <p className="text-muted-foreground">Current stage ends in</p>
+                      <p className="font-medium">
+                        {new Date(topic.workflow.stageEndsAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <div className="text-sm">
+                      <p className="text-muted-foreground">Participants</p>
+                      <p className="font-medium">{topic.participants.length}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                    <div className="text-sm">
+                      <p className="text-muted-foreground">Ideas submitted</p>
+                      <p className="font-medium">{topicIdeas.length}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
-        ))}
+          
+          {/* Idea Submission Section */}
+          {currentStage === 'submission' && (
+            <div className="mb-8">
+              <h2 className="text-lg font-semibold mb-4">Submit Your Idea</h2>
+              <NewIdeaForm topic={topic} />
+            </div>
+          )}
+          
+          {/* Ideas List */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Ideas ({topicIdeas.length})</h2>
+              
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+                
+                <div className="flex border rounded-md overflow-hidden">
+                  <Button 
+                    variant={viewType === 'card' ? 'default' : 'ghost'} 
+                    size="sm" 
+                    className="rounded-none h-9 px-3"
+                    onClick={() => setViewType('card')}
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </Button>
+                  <Separator orientation="vertical" />
+                  <Button 
+                    variant={viewType === 'table' ? 'default' : 'ghost'} 
+                    size="sm" 
+                    className="rounded-none h-9 px-3"
+                    onClick={() => setViewType('table')}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+            
+            {topicIdeas.length === 0 ? (
+              <Card>
+                <CardContent className="p-6 text-center">
+                  <p className="text-muted-foreground mb-4">No ideas have been submitted yet.</p>
+                  {currentStage === 'submission' && (
+                    <p>Be the first to submit an idea!</p>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {topicIdeas.map(idea => {
+                  const category = topic.categories.find(cat => cat.id === idea.categoryId);
+                  const author = users.find(user => user.id === idea.authorId);
+                  
+                  return (
+                    <IdeaCard 
+                      key={idea.id} 
+                      idea={idea} 
+                      category={category} 
+                      author={author}
+                      commentCount={0}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

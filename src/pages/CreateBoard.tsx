@@ -7,16 +7,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { BookTemplate, Users, Layout, Layers, PlusCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAppContext } from '@/context/AppContext';
+import { IdeaCategory } from '@/types';
 
 type BoardTemplate = {
   id: string;
   name: string;
   description: string;
   icon: React.ReactNode;
+  categories: IdeaCategory[];
 };
 
 const CreateBoard = () => {
   const navigate = useNavigate();
+  const { addTopic } = useAppContext();
   const [boardName, setBoardName] = useState('');
   const [boardDescription, setBoardDescription] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
@@ -27,18 +31,31 @@ const CreateBoard = () => {
       name: 'Blank Board',
       description: 'Start from scratch with an empty board',
       icon: <Layout className="h-12 w-12 text-primary" />,
+      categories: [
+        { id: 'cat-default-1', name: 'General', color: '#4F46E5' }
+      ]
     },
     {
       id: 'brainstorm',
       name: 'Brainstorming Session',
       description: 'Collaborative idea generation',
       icon: <Layers className="h-12 w-12 text-primary" />,
+      categories: [
+        { id: 'cat-brain-1', name: 'Feature', color: '#4F46E5' },
+        { id: 'cat-brain-2', name: 'Improvement', color: '#10B981' },
+        { id: 'cat-brain-3', name: 'Problem', color: '#F59E0B' }
+      ]
     },
     {
       id: 'teamplanning',
       name: 'Team Planning',
       description: 'Organize tasks and projects with your team',
       icon: <Users className="h-12 w-12 text-primary" />,
+      categories: [
+        { id: 'cat-team-1', name: 'Task', color: '#8B5CF6' },
+        { id: 'cat-team-2', name: 'Project', color: '#EC4899' },
+        { id: 'cat-team-3', name: 'Goal', color: '#06B6D4' }
+      ]
     },
   ];
 
@@ -55,20 +72,27 @@ const CreateBoard = () => {
       return;
     }
 
-    // In a real app, we would save this to a database
-    const newBoard = {
-      id: Date.now().toString(),
-      name: boardName,
-      description: boardDescription,
-      template: selectedTemplate,
-      createdAt: new Date().toISOString(),
-    };
+    const template = templates.find(t => t.id === selectedTemplate);
+    if (!template) return;
 
-    // For now, we'll simulate a successful creation
+    // Create the new topic
+    addTopic({
+      title: boardName,
+      description: boardDescription,
+      categories: template.categories,
+      workflow: {
+        currentStage: "introduction",
+        stages: ["introduction", "submission", "classification", "review", "voting", "finalization"],
+        stageStartedAt: new Date().toISOString(),
+        stageEndsAt: new Date(Date.now() + 86400000 * 7).toISOString() // 7 days from now
+      }
+    });
+
+    // Notify success
     toast.success('Board created successfully!');
     
-    // Navigate to the new board (in a real app, we'd use the actual board ID)
-    navigate('/boards/1');
+    // Navigate to dashboard (in a real app, we'd navigate to the new board)
+    navigate('/dashboard');
   };
 
   return (
