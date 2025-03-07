@@ -14,14 +14,16 @@ interface IdeaCardProps {
   category?: IdeaCategory;
   author?: User;
   commentCount?: number;
+  onClick?: () => void;
 }
 
-const IdeaCard: React.FC<IdeaCardProps> = ({ idea, category, author, commentCount = 0 }) => {
+const IdeaCard: React.FC<IdeaCardProps> = ({ idea, category, author, commentCount = 0, onClick }) => {
   const { voteIdea, currentUser, users } = useTopicContext();
   
   const hasVoted = currentUser ? idea.votes.includes(currentUser.id) : false;
   
-  const handleVote = () => {
+  const handleVote = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (currentUser) {
       voteIdea(idea.id, currentUser.id);
     }
@@ -46,7 +48,10 @@ const IdeaCard: React.FC<IdeaCardProps> = ({ idea, category, author, commentCoun
   const voters = idea.votes.map(id => users.find(user => user.id === id)).filter(Boolean) as User[];
   
   return (
-    <Card className="overflow-hidden transition-all duration-200 hover:shadow-sm border border-border/40">
+    <Card 
+      className="overflow-hidden transition-all duration-200 hover:shadow-sm border border-border/40 cursor-pointer"
+      onClick={onClick}
+    >
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-2">
           {category && (
@@ -121,7 +126,15 @@ const IdeaCard: React.FC<IdeaCardProps> = ({ idea, category, author, commentCoun
             </Tooltip>
           </TooltipProvider>
           
-          <Button variant="ghost" size="sm" className="h-8 px-2 text-muted-foreground">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-2 text-muted-foreground" 
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick?.();
+            }}
+          >
             <MessageSquare className="h-4 w-4 mr-1" />
             <span>{commentCount}</span>
           </Button>

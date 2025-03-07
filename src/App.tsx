@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "./context/AppContext";
+import { TopicProvider } from "./context/TopicContext";
 import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -19,27 +20,29 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AppProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/boards/create" element={<CreateBoard />} />
-            <Route path="/boards/:boardId" element={<ViewBoard />} />
-            <Route path="/boards" element={<Dashboard />} />
-            <Route path="/templates" element={<Dashboard />} />
-            <Route path="/team/invite" element={<Dashboard />} />
-            <Route path="/profile" element={<Dashboard />} />
-            <Route path="/billing" element={<Dashboard />} />
-            <Route path="/settings" element={<Dashboard />} />
-            <Route path="/analytics" element={<Dashboard />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <TopicProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/boards/create" element={<CreateBoard />} />
+              <Route path="/boards/:boardId" element={<ViewBoard />} />
+              <Route path="/boards" element={<Dashboard />} />
+              <Route path="/templates" element={<Dashboard />} />
+              <Route path="/team/invite" element={<Dashboard />} />
+              <Route path="/profile" element={<Dashboard />} />
+              <Route path="/billing" element={<Dashboard />} />
+              <Route path="/settings" element={<Dashboard />} />
+              <Route path="/analytics" element={<Dashboard />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TopicProvider>
       </AppProvider>
     </TooltipProvider>
   </QueryClientProvider>

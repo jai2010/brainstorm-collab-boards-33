@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
-import { useTopicContext } from '@/context/TopicContext';
-import { IdeaCategory, Topic } from '@/types';
+import { Topic } from '@/types';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { X, PlusCircle, Send } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { useAppContext } from '@/context/AppContext';
 
 interface NewIdeaFormProps {
   topic: Topic;
@@ -17,8 +17,7 @@ interface NewIdeaFormProps {
 }
 
 const NewIdeaForm: React.FC<NewIdeaFormProps> = ({ topic, onSuccess }) => {
-  const { addIdea, currentUser } = useTopicContext();
-  const { toast } = useToast();
+  const { addIdea, currentUser } = useAppContext();
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -44,38 +43,22 @@ const NewIdeaForm: React.FC<NewIdeaFormProps> = ({ topic, onSuccess }) => {
     e.preventDefault();
     
     if (!title.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter an idea title',
-        variant: 'destructive',
-      });
+      toast.error('Please enter an idea title');
       return;
     }
     
     if (!content.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Please enter idea content',
-        variant: 'destructive',
-      });
+      toast.error('Please enter idea content');
       return;
     }
     
     if (!categoryId) {
-      toast({
-        title: 'Error',
-        description: 'Please select a category',
-        variant: 'destructive',
-      });
+      toast.error('Please select a category');
       return;
     }
     
     if (!currentUser) {
-      toast({
-        title: 'Error',
-        description: 'You must be logged in to submit an idea',
-        variant: 'destructive',
-      });
+      toast.error('You must be logged in to submit an idea');
       return;
     }
     
@@ -86,8 +69,7 @@ const NewIdeaForm: React.FC<NewIdeaFormProps> = ({ topic, onSuccess }) => {
       content: content.trim(),
       authorId: currentUser.id,
       categoryId,
-      customTags: tags,
-      votes: [], // Adding the missing votes property as an empty array
+      customTags: tags
     });
     
     // Reset form
@@ -97,10 +79,7 @@ const NewIdeaForm: React.FC<NewIdeaFormProps> = ({ topic, onSuccess }) => {
     setTags([]);
     
     // Notify
-    toast({
-      title: 'Success',
-      description: 'Your idea has been submitted',
-    });
+    toast.success('Your idea has been submitted');
     
     // Callback
     if (onSuccess) {

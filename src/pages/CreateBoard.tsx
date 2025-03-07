@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BookTemplate, Users, Layout, Layers, PlusCircle } from 'lucide-react';
+import { BookTemplate, Users, Layout, Layers, Grid2X2, GitGraph, PlusCircle, LayoutGrid, LayoutList } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppContext } from '@/context/AppContext';
 import { IdeaCategory } from '@/types';
@@ -15,6 +16,7 @@ type BoardTemplate = {
   description: string;
   icon: React.ReactNode;
   categories: IdeaCategory[];
+  layout?: string;
 };
 
 const CreateBoard = () => {
@@ -32,7 +34,8 @@ const CreateBoard = () => {
       icon: <Layout className="h-12 w-12 text-primary" />,
       categories: [
         { id: 'cat-default-1', name: 'General', color: '#4F46E5' }
-      ]
+      ],
+      layout: 'blank'
     },
     {
       id: 'brainstorm',
@@ -43,7 +46,8 @@ const CreateBoard = () => {
         { id: 'cat-brain-1', name: 'Feature', color: '#4F46E5' },
         { id: 'cat-brain-2', name: 'Improvement', color: '#10B981' },
         { id: 'cat-brain-3', name: 'Problem', color: '#F59E0B' }
-      ]
+      ],
+      layout: 'list'
     },
     {
       id: 'teamplanning',
@@ -54,8 +58,47 @@ const CreateBoard = () => {
         { id: 'cat-team-1', name: 'Task', color: '#8B5CF6' },
         { id: 'cat-team-2', name: 'Project', color: '#EC4899' },
         { id: 'cat-team-3', name: 'Goal', color: '#06B6D4' }
-      ]
+      ],
+      layout: 'kanban'
     },
+    {
+      id: 'swot',
+      name: 'SWOT Analysis',
+      description: 'Strengths, Weaknesses, Opportunities, Threats',
+      icon: <Grid2X2 className="h-12 w-12 text-primary" />,
+      categories: [
+        { id: 'cat-swot-1', name: 'Strength', color: '#10B981' },
+        { id: 'cat-swot-2', name: 'Weakness', color: '#F59E0B' },
+        { id: 'cat-swot-3', name: 'Opportunity', color: '#3B82F6' },
+        { id: 'cat-swot-4', name: 'Threat', color: '#EF4444' }
+      ],
+      layout: 'grid-2x2'
+    },
+    {
+      id: 'retroboard',
+      name: 'Agile Retro Matrix',
+      description: 'What went well, what needs improvement, action items',
+      icon: <GitGraph className="h-12 w-12 text-primary" />,
+      categories: [
+        { id: 'cat-retro-1', name: 'What Went Well', color: '#10B981' },
+        { id: 'cat-retro-2', name: 'What Needs Improvement', color: '#F59E0B' },
+        { id: 'cat-retro-3', name: 'Action Items', color: '#3B82F6' }
+      ],
+      layout: 'columns-3'
+    },
+    {
+      id: 'impact',
+      name: 'Impact/Effort Matrix',
+      description: 'Prioritize ideas based on impact and effort',
+      icon: <LayoutGrid className="h-12 w-12 text-primary" />,
+      categories: [
+        { id: 'cat-impact-1', name: 'High Impact, Low Effort', color: '#10B981' },
+        { id: 'cat-impact-2', name: 'High Impact, High Effort', color: '#3B82F6' },
+        { id: 'cat-impact-3', name: 'Low Impact, Low Effort', color: '#F59E0B' },
+        { id: 'cat-impact-4', name: 'Low Impact, High Effort', color: '#EF4444' }
+      ],
+      layout: 'grid-2x2'
+    }
   ];
 
   const handleCreateBoard = (e: React.FormEvent) => {
@@ -79,10 +122,13 @@ const CreateBoard = () => {
       title: boardName,
       description: boardDescription,
       categories: template.categories,
+      admins: [], // Will be populated in context
+      participants: [], // Will be populated in context
       workflow: {
-        currentStage: "introduction",
+        currentStage: "submission",
         stageEndDate: new Date(Date.now() + 86400000 * 7) // 7 days from now
-      }
+      },
+      layout: template.layout
     });
 
     // Notify success

@@ -32,6 +32,7 @@ export type Topic = {
     currentStage: 'introduction' | 'submission' | 'classification' | 'review' | 'voting' | 'finalization';
     stageEndDate?: Date;
   };
+  layout?: string; // Added for template layouts
 };
 
 export type Idea = {
