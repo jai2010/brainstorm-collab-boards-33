@@ -31,6 +31,7 @@ const topicsMock: Topic[] = [
       { id: "cat-2", name: "UX", color: "#10B981" },
       { id: "cat-3", name: "Market", color: "#F59E0B" }
     ],
+    admins: ["user-1", "user-2"],
     participants: [
       { userId: "user-1", role: "owner" },
       { userId: "user-2", role: "admin" },
@@ -55,6 +56,7 @@ const topicsMock: Topic[] = [
       { id: "cat-5", name: "Content", color: "#EC4899" },
       { id: "cat-6", name: "Events", color: "#06B6D4" }
     ],
+    admins: ["user-1"],
     participants: [
       { userId: "user-1", role: "owner" },
       { userId: "user-2", role: "participant" },
@@ -179,6 +181,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       description: topic.description || "",
       ownerId: currentUser.id,
       categories: topic.categories || [],
+      admins: [currentUser.id],
       participants: [{ userId: currentUser.id, role: "owner" }],
       workflow: {
         currentStage: "introduction",

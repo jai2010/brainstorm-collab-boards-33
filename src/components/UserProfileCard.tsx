@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { User, BarChart } from 'lucide-react';
 import { User as UserType } from '@/types';
+import { useAppContext } from '@/context/AppContext';
 
 interface UserProfileCardProps {
   user: UserType;
@@ -19,7 +20,12 @@ interface UserProfileCardProps {
 
 const UserProfileCard: React.FC<UserProfileCardProps> = ({ user, usageCredits }) => {
   const navigate = useNavigate();
+  const { topics } = useAppContext();
   const usagePercentage = (usageCredits.used / usageCredits.total) * 100;
+  
+  // Find user's role from topics they participate in
+  const userRole = topics.flatMap(topic => topic.participants)
+    .find(participant => participant.userId === user.id)?.role || 'participant';
   
   return (
     <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -53,8 +59,8 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ user, usageCredits })
           <div className="pt-2 flex flex-wrap gap-3">
             <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs flex items-center">
               <BarChart className="mr-1 h-3 w-3" />
-              {user.participants?.find(p => p.userId === user.id)?.role === 'owner' ? 'Pro Plan' : 
-               user.participants?.find(p => p.userId === user.id)?.role === 'admin' ? 'Team Plan' : 'Basic Plan'}
+              {userRole === 'owner' ? 'Pro Plan' : 
+               userRole === 'admin' ? 'Team Plan' : 'Basic Plan'}
             </div>
             <div className="bg-muted px-3 py-1 rounded-full text-xs flex items-center">
               <span>{usageCredits.remaining} credits remaining</span>
