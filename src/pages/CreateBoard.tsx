@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -82,9 +81,7 @@ const CreateBoard = () => {
       categories: template.categories,
       workflow: {
         currentStage: "introduction",
-        stages: ["introduction", "submission", "classification", "review", "voting", "finalization"],
-        stageStartedAt: new Date().toISOString(),
-        stageEndsAt: new Date(Date.now() + 86400000 * 7).toISOString() // 7 days from now
+        stageEndDate: new Date(Date.now() + 86400000 * 7) // 7 days from now
       }
     });
 

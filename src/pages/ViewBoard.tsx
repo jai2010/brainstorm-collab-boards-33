@@ -130,7 +130,9 @@ const ViewBoard = () => {
                     <div className="text-sm">
                       <p className="text-muted-foreground">Current stage ends in</p>
                       <p className="font-medium">
-                        {new Date(topic.workflow.stageEndsAt).toLocaleDateString()}
+                        {topic.workflow.stageEndDate ? 
+                          new Date(topic.workflow.stageEndDate).toLocaleDateString() : 
+                          'Not set'}
                       </p>
                     </div>
                   </div>

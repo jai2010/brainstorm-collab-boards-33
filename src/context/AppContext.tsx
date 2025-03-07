@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Topic, User, Idea } from '@/types';
+import { Topic, User, Idea, UserRole } from '@/types';
 
 // Mock data for the current user
 const currentUserMock: User = {
@@ -8,7 +8,6 @@ const currentUserMock: User = {
   name: "Demo User",
   email: "demo@example.com",
   avatar: "/placeholder.svg",
-  role: "owner",
   isOnline: true
 };
 
@@ -41,12 +40,10 @@ const topicsMock: Topic[] = [
     ],
     workflow: {
       currentStage: "submission",
-      stages: ["introduction", "submission", "classification", "review", "voting", "finalization"],
-      stageStartedAt: new Date().toISOString(),
-      stageEndsAt: new Date(Date.now() + 86400000).toISOString() // 1 day from now
+      stageEndDate: new Date(Date.now() + 86400000) // 1 day from now
     },
-    createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-    updatedAt: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+    createdAt: new Date(Date.now() - 172800000), // 2 days ago
+    updatedAt: new Date(Date.now() - 86400000) // 1 day ago
   },
   {
     id: "2",
@@ -65,12 +62,10 @@ const topicsMock: Topic[] = [
     ],
     workflow: {
       currentStage: "review",
-      stages: ["introduction", "submission", "classification", "review", "voting", "finalization"],
-      stageStartedAt: new Date().toISOString(),
-      stageEndsAt: new Date(Date.now() + 43200000).toISOString() // 12 hours from now
+      stageEndDate: new Date(Date.now() + 43200000) // 12 hours from now
     },
-    createdAt: new Date(Date.now() - 432000000).toISOString(), // 5 days ago
-    updatedAt: new Date(Date.now() - 172800000).toISOString() // 2 days ago
+    createdAt: new Date(Date.now() - 432000000), // 5 days ago
+    updatedAt: new Date(Date.now() - 172800000) // 2 days ago
   }
 ];
 
@@ -82,7 +77,6 @@ const usersMock: User[] = [
     name: "Jane Smith",
     email: "jane@example.com",
     avatar: "/placeholder.svg",
-    role: "admin",
     isOnline: true
   },
   {
@@ -90,7 +84,6 @@ const usersMock: User[] = [
     name: "Alex Johnson",
     email: "alex@example.com",
     avatar: "/placeholder.svg",
-    role: "participant",
     isOnline: false
   },
   {
@@ -98,7 +91,6 @@ const usersMock: User[] = [
     name: "Sam Taylor",
     email: "sam@example.com",
     avatar: "/placeholder.svg",
-    role: "participant",
     isOnline: true
   },
   {
@@ -106,7 +98,6 @@ const usersMock: User[] = [
     name: "Morgan Lee",
     email: "morgan@example.com",
     avatar: "/placeholder.svg",
-    role: "participant",
     isOnline: false
   },
   {
@@ -114,7 +105,6 @@ const usersMock: User[] = [
     name: "Robin Williams",
     email: "robin@example.com",
     avatar: "/placeholder.svg",
-    role: "participant",
     isOnline: true
   }
 ];
@@ -190,23 +180,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       ownerId: currentUser.id,
       categories: topic.categories || [],
       participants: [{ userId: currentUser.id, role: "owner" }],
-      workflow: topic.workflow || {
+      workflow: {
         currentStage: "introduction",
-        stages: ["introduction", "submission", "classification", "review", "voting", "finalization"],
-        stageStartedAt: new Date().toISOString(),
-        stageEndsAt: new Date(Date.now() + 86400000).toISOString() // 1 day from now
+        stageEndDate: new Date(Date.now() + 86400000 * 7) // 7 days from now
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     
-    setTopics([newTopic, ...topics]);
+    setTopics([...topics, newTopic]);
   };
 
   // Update an existing topic
   const updateTopic = (topicId: string, updates: Partial<Topic>) => {
     setTopics(topics.map(topic => 
-      topic.id === topicId ? { ...topic, ...updates, updatedAt: new Date().toISOString() } : topic
+      topic.id === topicId ? { ...topic, ...updates, updatedAt: new Date() } : topic
     ));
   };
 

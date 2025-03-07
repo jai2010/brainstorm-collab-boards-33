@@ -53,7 +53,8 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ user, usageCredits })
           <div className="pt-2 flex flex-wrap gap-3">
             <div className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs flex items-center">
               <BarChart className="mr-1 h-3 w-3" />
-              {user.role === 'owner' ? 'Pro Plan' : user.role === 'admin' ? 'Team Plan' : 'Basic Plan'}
+              {user.participants?.find(p => p.userId === user.id)?.role === 'owner' ? 'Pro Plan' : 
+               user.participants?.find(p => p.userId === user.id)?.role === 'admin' ? 'Team Plan' : 'Basic Plan'}
             </div>
             <div className="bg-muted px-3 py-1 rounded-full text-xs flex items-center">
               <span>{usageCredits.remaining} credits remaining</span>
