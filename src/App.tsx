@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
+import CreateBoard from "./pages/CreateBoard";
+import ViewBoard from "./pages/ViewBoard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +25,8 @@ const App = () => (
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/boards/create" element={<Dashboard />} />
+          <Route path="/boards/create" element={<CreateBoard />} />
+          <Route path="/boards/:boardId" element={<ViewBoard />} />
           <Route path="/boards" element={<Dashboard />} />
           <Route path="/templates" element={<Dashboard />} />
           <Route path="/team/invite" element={<Dashboard />} />

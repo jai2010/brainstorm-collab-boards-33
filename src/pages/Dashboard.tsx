@@ -18,9 +18,23 @@ import {
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
+  // Mock recent boards data
+  const recentBoards = [
+    {
+      id: '1',
+      name: 'Product Brainstorming Session',
+      description: 'Ideas for our next product release',
+      lastEdited: '2 days ago',
+      participants: 5
+    },
+    {
+      id: '2',
+      name: 'Marketing Campaign Ideas',
+      description: 'Q4 marketing strategy brainstorming',
+      lastEdited: '5 days ago',
+      participants: 3
+    }
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -193,11 +207,40 @@ const Dashboard = () => {
                 <CardDescription>Your most recently accessed brainstorming boards</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">You have no recent boards yet.</p>
-                <Button onClick={() => navigate('/boards/create')}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Create New Board
-                </Button>
+                {recentBoards.length > 0 ? (
+                  <div className="space-y-4">
+                    {recentBoards.map(board => (
+                      <div 
+                        key={board.id} 
+                        className="border rounded-md p-4 hover:border-primary cursor-pointer transition-colors"
+                        onClick={() => navigate(`/boards/${board.id}`)}
+                      >
+                        <h3 className="font-medium">{board.name}</h3>
+                        <p className="text-sm text-muted-foreground">{board.description}</p>
+                        <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+                          <span>Last edited: {board.lastEdited}</span>
+                          <span>{board.participants} participants</span>
+                        </div>
+                      </div>
+                    ))}
+                    <Button 
+                      variant="outline" 
+                      className="w-full mt-2"
+                      onClick={() => navigate('/boards/create')}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Create New Board
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-muted-foreground mb-4">You have no recent boards yet.</p>
+                    <Button onClick={() => navigate('/boards/create')}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Create New Board
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
 
