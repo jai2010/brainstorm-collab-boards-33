@@ -25,9 +25,11 @@ export type Topic = {
   updatedAt: Date;
   ownerId: string;
   accessCode?: string;
+  scheduledDate?: Date;
   categories: IdeaCategory[];
   admins: string[]; // User IDs
   participants: { userId: string; role: UserRole }[];
+  invitedEmails?: string[];
   workflow: {
     currentStage: 'introduction' | 'submission' | 'classification' | 'review' | 'voting' | 'finalization';
     stageEndDate?: Date;
